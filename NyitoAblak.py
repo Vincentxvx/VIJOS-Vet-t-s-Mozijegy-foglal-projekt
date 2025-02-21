@@ -19,6 +19,10 @@ class FilmAblak:
         self.root.maxsize(1500, 1000)
         self.root.geometry('1500x1000')
 
+        test = Button(self.root)
+        test.place(relx=0.5, rely=0.5)
+
+
 
 
 
