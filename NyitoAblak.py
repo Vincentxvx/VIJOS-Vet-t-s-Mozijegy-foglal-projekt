@@ -5,6 +5,8 @@ from tkinter.messagebox import showinfo
 import tkinter.font as tkFont
 import os
 from PIL import Image, ImageTk
+import threading
+import time
 
 PrimaryColor = "#104F55"
 SecondaryColor = "#32746D"
@@ -36,7 +38,7 @@ class FilmAblak:
 
         
 
-        self.kep1 = Image.open("./demo_image.jpg").resize((1000,250))
+        self.kep1 = Image.open("./logo.png").resize((1000,250))
         self.kep1 = ImageTk.PhotoImage(self.kep1)
         self.hanyadik = 0
 
@@ -44,18 +46,36 @@ class FilmAblak:
         self.mylable = Label(self.root, image=self.kep1,bd=0,width=1000, height=250)
         self.mylable.place(anchor=N, relx=0.5, rely=0.04)
 
-        def kovetkezo():
-            if self.hanyadik == len(self.kepekkesz):
-
-                self.hanyadik = 0
-            else:
+        #carousel irányítás
+        def kovetkezo(irany):
+            if irany == 1:
+                print(self.hanyadik)
                 self.hanyadik += 1
+                if self.hanyadik >= len(self.kepekkesz):
+                    self.hanyadik = 0
+            else:
+                print(self.hanyadik)
+                self.hanyadik -= 1
+                if self.hanyadik < 0:
+                    self.hanyadik = len(self.kepekkesz) - 1
 
             self.mylable.config(image=self.kepekkesz[self.hanyadik])
+
+        def timer():
+            while True:
+                kovetkezo(1)
+                time.sleep(5)   
+
+        t = threading.Thread(target=timer)
+        t.start()
+
+
         
-        
-        gomb = Button(self.root, text="->", command=kovetkezo)
-        gomb.place(anchor=N, relx=0.95,rely=0.1)
+        elore = Button(self.root, text="->", command=lambda: kovetkezo(1))
+        elore.place(anchor=N, relx=0.95, rely=0.1)
+
+        hatra = Button(self.root, text="<-", command=lambda: kovetkezo(0))
+        hatra.place(anchor=N, relx=0.05, rely=0.1)
 
 
     def futtat(self):
