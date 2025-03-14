@@ -25,10 +25,12 @@ class FilmAblak:
 
         
         self.root.columnconfigure(0, weight=1)
-        self.root.columnconfigure(1, weight=5)
+        self.root.columnconfigure(1, weight=7)
         self.root.columnconfigure(2, weight=1)
         self.root.rowconfigure(0, weight=1)
-        self.root.rowconfigure(1, weight=5)
+        self.root.rowconfigure(1, weight=6)
+        self.root.rowconfigure(2, weight=1)
+        self.root.rowconfigure(3, weight=18)
 
        
         self.kepek = ["./logo.png", "./kep3.jpg", "./kep4.jpg", "./kep5.jpg"]
@@ -39,9 +41,19 @@ class FilmAblak:
             img = ImageTk.PhotoImage(img)
             self.kepekkesz.append(img)
 
+        # Navbar 
+        self.Navbar = Frame(self.root, bg="black")
+        self.Navbar.grid(row=0, columnspan=3, sticky=NSEW)
+        self.Navbar.columnconfigure(0, weight=1)
+        self.Navbar.rowconfigure(0, weight=1)
+        self.Navbutton = Button(self.Navbar)
+        self.Navbutton.place(relheight=1,relwidth=1)
+
         self.hanyadik = 0
         self.mylable = Label(self.root, image=self.kepekkesz[self.hanyadik], bd=0)
-        self.mylable.grid(row=0, column=1, pady=20, columnspan=1)
+        self.mylable.grid(row=1, column=1, columnspan=1, sticky=NSEW)
+        self.mylable.columnconfigure(0, weight=1)
+        self.mylable.rowconfigure(0, weight=1)
 
        
         def kovetkezo(irany):
