@@ -20,7 +20,7 @@ nemtom = AdatBazis.cursor()
 # AdatBazis.close()
 
 root = tk.Tk()
-root.title("30 Gombos Program")
+root.title("Mozi székek foglalása")
 
 rows = 9
 cols = 13
