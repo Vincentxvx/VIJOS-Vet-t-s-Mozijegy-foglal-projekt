@@ -15,73 +15,61 @@ QuaternaryColor = "#01200F"
 QuinaryColor = "#011502" 
 
 
-
-
 class FilmAblak:
     def __init__(self, cim):
         self.root = Tk()
         self.root.title(f"{cim}")
         self.root.config(bg=PrimaryColor)
-        self.root.minsize(1250, 1000)
-        self.root.maxsize(1250, 1000)
         self.root.geometry('1250x1000')
-
-        # Ablak teteji carousel
-        self.kepek = ["./logo.png","./kep3.jpg","./kep4.jpg","./kep5.jpg"]
-        self.kepekkesz = []
-        for i in range(0,len(self.kepek)):
-            self.name = f"kep{i+1}"
-            print(self.name)
-            self.name = Image.open(self.kepek[i]).resize((1000,250))
-            self.name = ImageTk.PhotoImage(self.name)
-            self.kepekkesz.append(self.name)
+        self.root.minsize(1250, 1000)
 
         
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(1, weight=5)
+        self.root.columnconfigure(2, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        self.root.rowconfigure(1, weight=5)
 
-        self.kep1 = Image.open("./logo.png").resize((1000,250))
-        self.kep1 = ImageTk.PhotoImage(self.kep1)
+       
+        self.kepek = ["./logo.png", "./kep3.jpg", "./kep4.jpg", "./kep5.jpg"]
+        self.kepekkesz = []
+        
+        for img_path in self.kepek:
+            img = Image.open(img_path).resize((1000, 250))
+            img = ImageTk.PhotoImage(img)
+            self.kepekkesz.append(img)
+
         self.hanyadik = 0
+        self.mylable = Label(self.root, image=self.kepekkesz[self.hanyadik], bd=0)
+        self.mylable.grid(row=0, column=1, pady=20, columnspan=1)
 
-
-        self.mylable = Label(self.root, image=self.kep1,bd=0,width=1000, height=250)
-        self.mylable.place(anchor=N, relx=0.5, rely=0.04)
-
-        #carousel irányítás
+       
         def kovetkezo(irany):
             if irany == 1:
-                print(self.hanyadik)
-                self.hanyadik += 1
-                if self.hanyadik >= len(self.kepekkesz):
-                    self.hanyadik = 0
+                self.hanyadik = (self.hanyadik + 1) % len(self.kepekkesz)
             else:
-                print(self.hanyadik)
-                self.hanyadik -= 1
-                if self.hanyadik < 0:
-                    self.hanyadik = len(self.kepekkesz) - 1
+                self.hanyadik = (self.hanyadik - 1) % len(self.kepekkesz)
 
             self.mylable.config(image=self.kepekkesz[self.hanyadik])
 
+        
         def timer():
             while True:
-                kovetkezo(1)
-                time.sleep(5)   
+                time.sleep(5)  
+                self.root.after(0, lambda: kovetkezo(1)) 
 
-        t = threading.Thread(target=timer)
+        t = threading.Thread(target=timer, daemon=True)
         t.start()
 
 
-        
-        elore = Button(self.root, text="->", command=lambda: kovetkezo(1))
-        elore.place(anchor=N, relx=0.95, rely=0.1)
+        hatra = Button(self.root, text="<-", command=lambda: kovetkezo(0), bg=SecondaryColor, fg="white")
+        hatra.grid(row=0, column=0, padx=20, pady=10, sticky="w")
 
-        hatra = Button(self.root, text="<-", command=lambda: kovetkezo(0))
-        hatra.place(anchor=N, relx=0.05, rely=0.1)
-
+        elore = Button(self.root, text="->", command=lambda: kovetkezo(1), bg=SecondaryColor, fg="white")
+        elore.grid(row=0, column=2, padx=20, pady=10, sticky="e")
 
     def futtat(self):
         self.root.mainloop()
-
-
 
 
 def megnyitas():
