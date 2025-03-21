@@ -1,34 +1,20 @@
 from adatbázis import AdatBazis
-import mysql
 import mysql.connector
 from tkinter import * 
 import tkinter as tk
 from tkinter import messagebox
 
-
 nemtom = AdatBazis.cursor()
-
-
-
-
-# DELETE
-# sigma = "DELETE FROM terem WHERE Terem_Szam = 1"
-
-# nemtom.execute(sigma)
-
-# AdatBazis.commit()
-# AdatBazis.close()
-
-root = tk.Tk()
-root.title("Mozi székek foglalása")
 
 rows = 9
 cols = 13
-
-
 gomb_szamlalo = 1
 kivalasztott_gomb = {}
 foglalt_gomb = []
+
+nemtom = AdatBazis.cursor(buffered=True)
+nemtom.execute("SELECT Terem_Szam, Terem_ulohelyek, Terem_foglalt_ulohelyek FROM terem")
+
 
 def beolvas_foglalt_gombokat():
     foglalt_gombok = []
@@ -41,7 +27,6 @@ def beolvas_foglalt_gombokat():
     except FileNotFoundError:
         pass
     return foglalt_gombok
-
 
 def HIBA():
     global foglalt_gomb
@@ -62,58 +47,47 @@ def Gomb_Szin(button, button_id):
     else:
         kivalasztott_gomb[button_id] = button
         button.config(bg="yellow")
-
 def foglal():
-    nemtom.execute("SELECT Terem_Szam, Terem_ulohelyek FROM Terem")
-    termek = nemtom.fetchall()
+    global foglalt_gomb
+    try:
+        terem_szam = 1
+        film = 'Film1'
+        adat = 'Adat1'
+        filmID = 7
+        
+        total_seats = 180
+        
+        nemtom.execute("SELECT COUNT(*) FROM terem WHERE Terem_Szam = %s", (terem_szam,))
+        booked_count = nemtom.fetchone()[0]
+        
+        if total_seats - booked_count < len(kivalasztott_gomb):
+            messagebox.showerror("Hiba", "Nincs elég szék!")
+            return
 
-    for terem in termek:
-        terem_szam = terem[0]
-        teremben_ulohelyek = terem[1]
-
-        print(f"Terem {terem_szam} - Ülőhelyek: {teremben_ulohelyek}")
-
-        if teremben_ulohelyek > 0:
-            uj_ulohelyek = teremben_ulohelyek - 1
-        else:
-            uj_ulohelyek = 180
-
-        nemtom.execute(
-            "UPDATE Terem SET Terem_ulohelyek = %s WHERE Terem_Szam = %s",
-            (uj_ulohelyek, terem_szam)
-        )
-
-    nemtom.execute("SELECT Terem_Szam, Terem_ulohelyek FROM Terem")
-    termek = nemtom.fetchall()
-    for terem in termek:
-        print(f"Utolsó frissítés - Terem {terem[0]}: Ülőhelyek: {terem[1]}")
-
-    AdatBazis.commit()
-
-    nemtom.execute("DROP EVENT IF EXISTS csokkeno_ulohelyek")
-
-    szamlalo = """    """
-
-    nemtom.execute(szamlalo)
-    AdatBazis.commit()
-
-    with open("foglalas.txt", "a") as file:
-        for button_id in kivalasztott_gomb:
-            file.write(f"Foglalva: {button_id}\n")
-            button = kivalasztott_gomb[button_id]
-            button.config(bg="red") 
-            foglalt_gomb.append(button_id)
+        for i, button_id in enumerate(kivalasztott_gomb):
+            new_available = total_seats - (booked_count + i + 1)
             
-            mozi = """
-            INSERT INTO terem (Terem_Szam, Teremben_vetittett_film, STB_filmes_adat, Terem_ulohelyek, Terem_foglalt_ulohelyek) 
-            VALUES (%s, %s, %s, %s, %s)
+            insert_query = """
+            INSERT INTO terem (Terem_Szam, Teremben_vetittett_film, STB_filmes_adat, Terem_ulohelyek, Terem_foglalt_ulohelyek, filmID)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """
-            mozik = (1, "asdf", "as", 180, button_id)  
-            nemtom.execute(mozi, mozik)
-            AdatBazis.commit()
-
-    messagebox.showinfo("Foglalás", "Sikeresen lefoglaltad a kiválasztott gombokat!")
+            nemtom.execute(insert_query, (terem_szam, film, adat, new_available, button_id, filmID))
+        
+        AdatBazis.commit()
+        
+        with open("foglalas.txt", "a") as file:
+            for button_id in kivalasztott_gomb:
+                file.write(f"Foglalva: {button_id}\n")
+                button = kivalasztott_gomb[button_id]
+                button.config(bg="red")
+                foglalt_gomb.append(button_id)
+        
+        messagebox.showinfo("Foglalás", "Sikeresen lefoglaltad a kiválasztott gombokat!")
     
+    except mysql.connector.Error as err:
+        print(f"SQL hiba: {err}")
+        messagebox.showerror("Hiba", "Hiba történt a foglalás során!")
+
 def Gomb_Letrehozasa():
     global gomb_szamlalo
     for row in range(rows):
@@ -126,6 +100,9 @@ def Gomb_Letrehozasa():
                 button.config(command=lambda b=button, id=button_id: Gomb_Szin(b, id))  
                 button.grid(row=row, column=col)
                 gomb_szamlalo += 1
+
+root = tk.Tk()
+root.title("Mozi székek foglalása")
 
 foglalas_button = tk.Button(root, text="Foglalás", width=5, height=2, command=foglal)
 foglalas_button.grid(column=6, row=10)

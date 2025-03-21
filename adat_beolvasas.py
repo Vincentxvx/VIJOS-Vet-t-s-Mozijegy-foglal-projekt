@@ -52,7 +52,8 @@ def foglal():
     if "@" not in gmail:
         messagebox.showerror("Hiba", "Érvénytelen email cím!")
         return
-
+    
+    kapcsolat = None  # Alapértelmezett kapcsolat változó
     try:
         kapcsolat = mysql.connector.connect(
             host="localhost",
@@ -68,11 +69,13 @@ def foglal():
             messagebox.showerror("Hiba", "Nincs érvényes film az adatbázisban!")
             return
         
+        filmID = result[0]  # filmID kiolvasása
+
         sql = """
-        INSERT INTO foglalo (VezetekNev, KeresztNev, LakCim, IranyitoSzam, Gmail, Telefonszam)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO foglalo (VezetekNev, KeresztNev, LakCim, IranyitoSzam, Gmail, Telefonszam, filmID)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        adatok = (vezeteknev, keresztnev, lakcim, iranyitoszam, gmail, telefonszam)
+        adatok = (vezeteknev, keresztnev, lakcim, iranyitoszam, gmail, telefonszam, filmID)
         cursor.execute(sql, adatok)
         kapcsolat.commit()
 
@@ -81,11 +84,11 @@ def foglal():
         print(err)
         messagebox.showerror("Adatbázis hiba", f"Hiba: {err}")
     finally:
-        if kapcsolat.is_connected():
+        if kapcsolat and kapcsolat.is_connected():
             cursor.close()
             kapcsolat.close()
 
-foglalas = tk.Button(root, text="Foglalás", width=5, height=2, command=foglal)
-foglalas.place(relx=0.5, rely=0.9)
+foglalas = tk.Button(root, text="Foglalás", width=10, height=2, command=foglal)
+foglalas.place(relx=0.4, rely=0.8)
 
 root.mainloop()
