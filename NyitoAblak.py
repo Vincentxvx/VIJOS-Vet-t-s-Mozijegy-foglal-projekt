@@ -46,7 +46,7 @@ class FilmAblak:
         self.Navbar.grid(row=0, columnspan=3, sticky=NSEW)
         self.Navbar.columnconfigure(0, weight=1)
         self.Navbar.rowconfigure(0, weight=1)
-        self.Navbutton = Button(self.Navbar)
+        self.Navbutton = Button(self.Navbar, bg="black", state=DISABLED)
         self.Navbutton.place(relheight=1,relwidth=1)
 
         self.hanyadik = 0
