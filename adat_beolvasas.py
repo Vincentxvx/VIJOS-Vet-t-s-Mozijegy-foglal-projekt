@@ -76,6 +76,7 @@ def foglal():
             messagebox.showerror("Hiba", "Nincs érvényes film az adatbázisban!")
             return
         
+        global filmID
         filmID = result[0]  # filmID kiolvasása
 
         sql = """
