@@ -77,7 +77,7 @@ def foglal():
             return
         
         global filmID
-        filmID = result[0]  # filmID kiolvasása
+        filmID = result[0]
 
         sql = """
         INSERT INTO foglalo (VezetekNev, KeresztNev, LakCim, IranyitoSzam, Gmail, Telefonszam, filmID)
