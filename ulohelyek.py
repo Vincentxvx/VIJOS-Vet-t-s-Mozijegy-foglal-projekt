@@ -47,6 +47,7 @@ def Gomb_Szin(button, button_id):
     else:
         kivalasztott_gomb[button_id] = button
         button.config(bg="yellow")
+        
 def foglal():
     global foglalt_gomb
     try:

@@ -49,11 +49,11 @@ def foglal():
         messagebox.showerror("Hiba", "Minden mezőt ki kell tölteni!")
         return
     
-    if "@" not in gmail:
+    if "@" and ".com" or ".hu" not in gmail:
         messagebox.showerror("Hiba", "Érvénytelen email cím!")
         return
     
-    kapcsolat = None  # Alapértelmezett kapcsolat változó
+    kapcsolat = None
     try:
         kapcsolat = mysql.connector.connect(
             host="localhost",
@@ -69,7 +69,7 @@ def foglal():
             messagebox.showerror("Hiba", "Nincs érvényes film az adatbázisban!")
             return
         
-        filmID = result[0]  # filmID kiolvasása
+        filmID = result[0]
 
         sql = """
         INSERT INTO foglalo (VezetekNev, KeresztNev, LakCim, IranyitoSzam, Gmail, Telefonszam, filmID)
