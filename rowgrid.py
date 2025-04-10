@@ -1,25 +1,26 @@
-from tkinter import *
 from customtkinter import *
-from tkinter.ttk import Combobox
+from tkinter import Frame, Label
 from PIL import Image, ImageTk
+from tkinter.ttk import Combobox
 import os
-import threading
-import time
+import subprocess
+import temp_data
+import sys
 
+set_appearance_mode("dark")
 
-PrimaryColor = "#0F0F1A"
-SecondaryColor = "#1C1C2A"
-TertiaryColor = "#2A2A3F"
+PrimaryColor = "#1E1E2F"
+SecondaryColor = "#2C2C3C"
+TertiaryColor = "#3C3C4F"
 QuaternaryColor = "#E0E0E0"
 QuinaryColor = "#00FFF5"
 
-set_appearance_mode("dark")
-set_default_color_theme("dark-blue")
-
+temp_data.clear_data()  
 
 class MovieCard(CTkFrame):
     def __init__(self, master, data, **kwargs):
-        super().__init__(master, corner_radius=15, fg_color="#1A1A2E", border_width=2, border_color=QuinaryColor, **kwargs)
+        super().__init__(master, corner_radius=12, fg_color=TertiaryColor, **kwargs)
+        self.data = data
         self.configure(height=200)
         self.grid_propagate(False)
         self.columnconfigure(1, weight=1)
@@ -40,8 +41,28 @@ class MovieCard(CTkFrame):
         times_frame = CTkFrame(self, fg_color="transparent")
         times_frame.grid(row=2, column=1, sticky="w", padx=10, pady=(0, 10))
         for i, time in enumerate(data['showtimes'].split(',')):
-            time_btn = CTkButton(times_frame, text=time.strip(), width=70, height=30, font=("Orbitron", 12), fg_color=QuinaryColor, hover_color="#00D9C0", text_color="black", corner_radius=30)
+            def make_callback(t=time.strip()):
+                return lambda: self.select_movie_time(t)
+            time_btn = CTkButton(times_frame, text=time.strip(), width=70, height=30,
+                                 font=("Orbitron", 12), fg_color=QuinaryColor,
+                                 hover_color="#00D9C0", text_color="black",
+                                 corner_radius=30, command=make_callback())
             time_btn.grid(row=0, column=i, padx=5)
+
+    def select_movie_time(self, time):
+        selected_movie = {
+            "title": self.data['title'],
+            "day": self.data['day'],
+            "time": time,
+            "image": self.data['image'],
+            "format": self.data['format'],
+            "genre": self.data['genre'],
+            "duration": self.data['duration'],
+            "terem_szam": 1
+        }
+        temp_data.save_data({"selected_movie": selected_movie})
+        subprocess.Popen([sys.executable, "ulohelyek.py"])
+        self.winfo_toplevel().destroy()
 
 
 class MovieDisplay(CTkFrame):
@@ -50,8 +71,10 @@ class MovieDisplay(CTkFrame):
         self.movie_file = movie_file
         self.movies = self.load_movies()
 
-        self.day_select = CTkComboBox(self, values=self.get_unique_days(), command=self.update_display, font=("Segoe UI", 14), state="readonly")
+        days = self.get_unique_days()
+        self.day_select = CTkComboBox(self, values=days, command=self.update_display, font=("Segoe UI", 14), state="readonly")
         self.day_select.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        self.day_select.set(days[0])
 
         self.scrollable = CTkScrollableFrame(self, fg_color="transparent", width=1100, height=600)
         self.scrollable.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
@@ -118,7 +141,7 @@ class FilmAblak:
 
         row1 = Frame(self.root, bg=SecondaryColor)
         row1.grid(row=0, column=0, columnspan=3, sticky="nsew")
-        Label(row1, text="🎮 VIJOS Cinema", bg=SecondaryColor, fg="white", font=("Orbitron", 16)).grid(sticky="nsew")
+        Label(row1, text="🎬 VIJOS Cinema", bg=SecondaryColor, fg="white", font=("Orbitron", 16)).grid(sticky="nsew")
 
         self.hanyadik = 0
         row2 = Frame(self.root, bg=PrimaryColor)
@@ -135,6 +158,7 @@ class FilmAblak:
                 self.hanyadik = (self.hanyadik - 1) % len(self.kepekkesz)
             self.mylable.config(image=self.kepekkesz[self.hanyadik])
 
+        import threading, time
         def timer():
             while True:
                 time.sleep(5)
@@ -157,18 +181,18 @@ class FilmAblak:
 
         col1 = CTkFrame(self.root, fg_color=PrimaryColor)
         col1.grid(column=0, row=3, sticky="nsew")
-        CTkLabel(col1, text="Bal oldal", text_color=QuinaryColor, font=("Orbitron", 16)).pack(pady=10)
+        CTkLabel(col1, text="", text_color=QuinaryColor, font=("Orbitron", 16)).pack(pady=10)
 
         col2 = CTkFrame(self.root, fg_color=PrimaryColor)
         col2.grid(column=2, row=3, sticky="nsew")
-        CTkLabel(col2, text="Jobb oldal", text_color=QuinaryColor, font=("Orbitron", 16)).pack(pady=10)
+        CTkLabel(col2, text="", text_color=QuinaryColor, font=("Orbitron", 16)).pack(pady=10)
 
     def futtat(self):
         self.root.mainloop()
 
 def megnyitas():
-    film_ablak = FilmAblak("VIJOS")
-    film_ablak.futtat()
+    app = FilmAblak("VIJOS")
+    app.futtat()
 
 if __name__ == "__main__":
     megnyitas()
