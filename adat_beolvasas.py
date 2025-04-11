@@ -1,104 +1,60 @@
-from tkinter import *
-import tkinter as tk
+import temp_data
+from customtkinter import *
 from tkinter import messagebox
-import mysql.connector
-from jegy_keszito import jegy
+import subprocess
+import sys
 
-root = tk.Tk()
-root.title("Felhasználó adat bekérése")
-root.geometry('500x400')
+set_appearance_mode("dark")
 
-vezeteknev_label = Label(root, text="Vezetéknév")
-vezeteknev_label.place(relx=0.1, rely=0.1)
-vezeteknev_text = tk.Entry(root, width=40)
-vezeteknev_text.place(relx=0.3, rely=0.1)
+PrimaryColor = "#1E1E2F"
+SecondaryColor = "#2C2C3C"
+TertiaryColor = "#3C3C4F"
+QuaternaryColor = "#E0E0E0"
+QuinaryColor = "#00FFF5"
 
-keresztnev_label = Label(root, text="Keresztnév")
-keresztnev_label.place(relx=0.1, rely=0.2)
-keresztnev_text = tk.Entry(root, width=40)
-keresztnev_text.place(relx=0.3, rely=0.2)
 
-lakcim_label = Label(root, text="Lak Cím")
-lakcim_label.place(relx=0.1, rely=0.3)
-lakcim_text = tk.Entry(root, width=40)
-lakcim_text.place(relx=0.3, rely=0.3)
+root = CTk()
+root.title("Foglaló adatai")
+root.geometry("400x300")
+root.configure(fg_color=PrimaryColor)
+root.resizable(False, False)
 
-iranyitoszam_label = Label(root, text="Irányító szám")
-iranyitoszam_label.place(relx=0.1, rely=0.4)
-iranyitoszam_text = tk.Entry(root, width=40)
-iranyitoszam_text.place(relx=0.3, rely=0.4)
 
-gmail_label = Label(root, text="Email")
-gmail_label.place(relx=0.1, rely=0.5)
-gmail_text = tk.Entry(root, width=40)
-gmail_text.place(relx=0.3, rely=0.5)
+CTkLabel(root, text="Név", text_color=QuinaryColor, font=("Segoe UI", 14)).grid(row=0, column=0, padx=10, pady=10, sticky="e")
+CTkLabel(root, text="Email", text_color=QuinaryColor, font=("Segoe UI", 14)).grid(row=1, column=0, padx=10, pady=10, sticky="e")
+CTkLabel(root, text="Telefon", text_color=QuinaryColor, font=("Segoe UI", 14)).grid(row=2, column=0, padx=10, pady=10, sticky="e")
 
-telefonszam_label = Label(root, text="Telefonszám")
-telefonszam_label.place(relx=0.1, rely=0.6)
-telefonszam_text = tk.Entry(root, width=40)
-telefonszam_text.place(relx=0.3, rely=0.6)
+name_entry = CTkEntry(root, width=220, corner_radius=8, fg_color=TertiaryColor, text_color="white")
+email_entry = CTkEntry(root, width=220, corner_radius=8, fg_color=TertiaryColor, text_color="white")
+phone_entry = CTkEntry(root, width=220, corner_radius=8, fg_color=TertiaryColor, text_color="white")
 
-def foglal():
-    global vezeteknev
-    vezeteknev = vezeteknev_text.get().strip()
-    global keresztnev
-    keresztnev = keresztnev_text.get().strip()
-    global lakcim
-    lakcim = lakcim_text.get().strip()
-    global iranyitoszam
-    iranyitoszam = iranyitoszam_text.get().strip()
-    global gmail
-    gmail = gmail_text.get().strip()
-    global telefonszam
-    telefonszam = telefonszam_text.get().strip()
+name_entry.grid(row=0, column=1, padx=10, pady=10)
+email_entry.grid(row=1, column=1, padx=10, pady=10)
+phone_entry.grid(row=2, column=1, padx=10, pady=10)
 
-    if not (vezeteknev and keresztnev and lakcim and iranyitoszam and gmail and telefonszam):
-        messagebox.showerror("Hiba", "Minden mezőt ki kell tölteni!")
+
+def submit():
+    name = name_entry.get().strip()
+    email = email_entry.get().strip()
+    phone = phone_entry.get().strip()
+
+    if not name or not email or not phone:
+        messagebox.showerror("Hiba", "Minden mező kitöltése kötelező!")
         return
-    
-    if "@" and ".com" or ".hu" not in gmail:
-        messagebox.showerror("Hiba", "Érvénytelen email cím!")
-        return
-    
-    kapcsolat = None
-    try:
-        kapcsolat = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="mozijegy"
-        )
-        cursor = kapcsolat.cursor()
 
-        cursor.execute("SELECT filmID FROM terem LIMIT 1")
-        result = cursor.fetchone()
-        if not result:
-            messagebox.showerror("Hiba", "Nincs érvényes film az adatbázisban!")
-            return
-        
-        global filmID
-        filmID = result[0]
+    data = temp_data.load_data()
+    data["customer_data"] = {
+        "name": name,
+        "email": email,
+        "phone": phone
+    }
+    temp_data.save_data(data)
 
-        sql = """
-        INSERT INTO foglalo (VezetekNev, KeresztNev, LakCim, IranyitoSzam, Gmail, Telefonszam, filmID)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-        adatok = (vezeteknev, keresztnev, lakcim, iranyitoszam, gmail, telefonszam, filmID)
-        cursor.execute(sql, adatok)
-        kapcsolat.commit()
-        messagebox.showinfo("Siker", "Foglalás sikeresen rögzítve!")
-        
-        jegy()
-        
-    except mysql.connector.Error as err:
-        print(err)
-        messagebox.showerror("Adatbázis hiba", f"Hiba: {err}")
-    finally:
-        if kapcsolat and kapcsolat.is_connected():
-            cursor.close()
-            kapcsolat.close()
+    root.destroy()
+    subprocess.Popen([sys.executable, "jegy_keszito.py"])
 
-foglalas = tk.Button(root, text="Foglalás", width=10, height=2, command=foglal)
-foglalas.place(relx=0.4, rely=0.8)
+CTkButton(root, text="Tovább", command=submit, width=200, height=40,
+          fg_color=QuinaryColor, hover_color="#00D9C0", text_color="black",
+          font=("Orbitron", 14), corner_radius=20).grid(row=3, column=0, columnspan=2, pady=25)
 
 root.mainloop()
