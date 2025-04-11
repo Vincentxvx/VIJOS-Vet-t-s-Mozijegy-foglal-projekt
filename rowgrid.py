@@ -54,7 +54,6 @@ class MovieCard(CTkFrame):
             "title": self.data['title'],
             "day": self.data['day'],
             "time": time,
-            "image": self.data['image'],
             "format": self.data['format'],
             "genre": self.data['genre'],
             "duration": self.data['duration'],
