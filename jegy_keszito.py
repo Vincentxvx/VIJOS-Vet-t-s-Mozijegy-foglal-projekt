@@ -70,7 +70,7 @@ def jegy():
 
             mozijegy.set_text_color(0, 0, 0)
             mozijegy.set_font("Arial", "", 23.5)
-            mozijegy.text(90.25, 30, "577635437")
+            mozijegy.text(90.25, 30, f"{random.randint(100000000, 999999999)}")
 
             mozijegy.set_text_color(225, 165, 0)
             mozijegy.set_font("Arial", "B", 23.5)
