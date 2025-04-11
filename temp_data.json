@@ -2,7 +2,7 @@
     "selected_movie": {
         "title": "Skyburn",
         "day": "2025-04-06",
-        "time": "20:00",
+        "time": "12:30",
         "image": "kep3.jpg",
         "format": "3D",
         "genre": "Thriller",
@@ -10,14 +10,21 @@
         "terem_szam": 1,
         "seats": [
             [
-                1,
+                4,
                 4
+            ],
+            [
+                4,
+                5
             ]
         ]
     },
     "customer_data": {
-        "name": "hfcxkhfcx",
-        "email": "iszrkszf",
-        "phone": "dzrtikdhfg"
+        "name": "Török László",
+        "postcode": "8174",
+        "address": "Balatonkenese",
+        "street": "nigga 69",
+        "email": "sigma@sigma.com",
+        "phone": "+36309632131"
     }
 }
