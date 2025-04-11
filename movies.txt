@@ -32,4 +32,4 @@ image=kep5.jpg;title=Midnight Echo;rating=R;genre=Action;duration=120;format=3D;
 image=kep5.jpg;title=Midnight Echo;rating=G;genre=Animation;duration=140;format=2D;showtimes=10:00,12:30,15:00,17:30,20:00;day=2025-04-12
 image=kep4.jpg;title=Neon Pulse;rating=G;genre=Sci-Fi;duration=105;format=3D;showtimes=09:45,13:00,16:15,19:30;day=2025-04-12
 image=kep3.jpg;title=HoloHeist;rating=PG-13;genre=Action;duration=150;format=2D;showtimes=09:45,13:00,16:15,19:30;day=2025-04-12
-image=kep3.jpg;title=Dreamline;rating=PG;genre=Sci-Fi;duration=95;format=2D;showtimes=09:45,13:00,16:15,19:30;day=2025-04-12
+image=kep3.jpg;title=Dreamline;rating=PG;genre=Sci-Fi;duration=95;format=2D;showtimes=09:45,13:00,16:15,19:30;day=2025-04-12git 
